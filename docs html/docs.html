@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiro API - Painel de APIs</title>
+    <style>
+        /* Reset de estilos */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Garante que o body ocupe toda a altura da tela */
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #1c1c1c;
+            height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #333;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            transition: left 0.3s ease-in-out;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar h2 {
+            color: #00ff00;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar h2 .close-btn {
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        .menu-item {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #222;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .menu-item:hover {
+            background-color: #333;
+        }
+
+        .menu-item span {
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .submenu {
+            display: none;
+            margin-top: 5px;
+            margin-left: 15px;
+            flex-direction: column;
+        }
+
+        /* Estilo do botão de link */
+        .nav-link {
+            display: flex;
+            align-items: center; /* Alinha o texto no centro verticalmente */
+            justify-content: center; /* Centraliza o texto horizontalmente */
+            padding: 10px 15px; /* Adiciona espaço ao redor do texto */
+            background-color: #007bff; /* Cor de fundo */
+            color: #fff; /* Cor do texto */
+            text-transform: uppercase; /* Transforma o texto em maiúsculas */
+            border-radius: 5px; /* Bordas arredondadas */
+            text-decoration: none; /* Remove o sublinhado */
+            transition: background-color 0.3s; /* Transição suave para a cor de fundo */
+        }
+
+        .nav-link:hover {
+            background-color: #0056b3; /* Cor do botão quando o mouse passa por cima */
+        }
+
+        .submenu a {
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #333;
+        }
+
+        header h1 {
+            color: #00ff00;
+            font-size: 2.5em;
+        }
+
+        .api-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .api-card {
+            width: 250px;
+            background-color: #1c1c1c;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+        }
+
+        .api-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.7);
+        }
+
+        .api-card h3 {
+            color: #00ff00;
+            margin-bottom: 10px;
+        }
+
+        .api-card p {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 15px;
+        }
+
+        .api-card a {
+            text-decoration: none;
+            color: #007bff;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .api-card a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: auto; /* Faz o footer ficar na parte inferior */
+            color: #aaa;
+            font-size: 14px;
+            padding: 10px 0; /* Adiciona um pouco de espaço ao redor do footer */
+        }
+
+        /* Responsividade para telas menores */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            header h1 {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                transition: left 0.3s ease-in-out;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            /* Botão do menu para celular */
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                background-color: #00ff00;
+                border: none;
+                padding: 10px;
+                border-radius: 5px;
+                cursor: pointer;
+                z-index: 1001;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding-top: 60px;
+            }
+
+            .api-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .api-card {
+                width: 90%;
+            }
+
+            /* Esconde o botão de menu quando a sidebar estiver ativa */
+            .menu-toggle.hidden {
+                display: none;
+            }
+
+            .sidebar h2 .close-btn {
+                display: inline;
+            }
+
+            .menu-toggle.hidden {
+                display: none;
+            }
+        }
+
+        /* Esconde o botão de menu no desktop */
+        @media (min-width: 769px) {
+            .menu-toggle {
+                display: none;
+            }
+        }
+    </style>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const menuButton = document.querySelector('.menu-toggle');
+            const closeButton = document.querySelector('.sidebar h2 .close-btn');
+
+            // Adiciona ou remove a classe "active" na sidebar
+            sidebar.classList.toggle('active');
+
+            // Esconde ou mostra o botão de menu
+            if (sidebar.classList.contains('active')) {
+                menuButton.classList.add('hidden');
+            } else {
+                menuButton.classList.remove('hidden');
+            }
+        }
+
+        function toggleSubmenu(menuId) {
+            const submenu = document.getElementById(menuId);
+            submenu.style.display = submenu.style.display === 'flex' ? 'none' : 'flex';
+        }
+    </script>
+</head>
+<body>
+    <!-- Botão para mobile -->
+    <button class="menu-toggle" onclick="toggleSidebar()">☰ Menu</button>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Hiro API 
+            <span class="close-btn" onclick="toggleSidebar()">←</span>
+        </h2>
+
+        <div class="menu-item" onclick="toggleSubmenu('menu-downloads')">
+            <span>Downloads</span>
+            <span>▼</span>
+        </div>
+        <div class="submenu" id="menu-downloads">
+            <a class="nav-link" href="/youtube/download?url=<URL DO VIDEO>&format=mp3||mp4" target="_blank">YouTube mp3/mp4</a>
+            <a class="nav-link" href="/tiktok/download?url=" target="_blank">TikTok download</a>
+            <a class="nav-link" href="/api/twitter/download?url=https://x.com/MemeMccree/status/1871704283869254090" target="_blank">Twitter mp4</a>
+        </div>
+
+        <div class="menu-item" onclick="toggleSubmenu('menu-18')">
+            <span>Conteúdo +18</span>
+            <span>▼</span>
+        </div>
+        <div class="submenu" id="menu-18">
+            <a class="nav-link" href="/adult/media?userPermission=true" target="_blank">Hentai</a>
+            <a class="nav-link" href="/media/loli?userPermission=true" target="_blank">Loli</a>
+            <a class="nav-link" href="/videos/search?query=" target="_blank">Pornohub search</a>
+        </div>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="main-content">
+        <header>
+            <h1>Hiro API</h1>
+        </header>
+        <div class="api-container">
+            <div class="api-card">
+                <h3>Suporte</h3>
+                <p>Se encontar error, entre contato com suporte.</p>
+                <a href="https://w.app/NVjchs">Acessar</a>
+            </div>
+            <div class="api-card">
+                <h3>Hiro MD Bot</h3>
+                <p>Bot do nosso sevidor.</p>
+                <a href="https://w.app/C27KOy">Acessar</a>
+            </div>
+            <div class="api-card">
+                <h3>Space Consultas</h3>
+                <p>consultas de cpf,nome,cnpj....</p>
+                <a href="https://t.me/APEXCONSUL">Acessar</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Hiro API. Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html>
